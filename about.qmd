@@ -1,0 +1,13 @@
+---
+title: "About"
+format: html
+editor: visual
+---
+
+This project was developed by **\[Tidyverse Masters\]** For [INFO 2950: Introduction to Data Science](https://info2950.infosci.cornell.edu) at Cornell University. The team is comprised of the following team members.
+
+-   Team member 1: I'm Serena majoring in ORIE.
+-   Team member 2: Yvie Cai, Bio&Info Sci, Class of 2024, from Vancouver (lets go Vancouver Canucks)
+-   Team member 3: My name is Cathryn, and I am a sophomore majoring in Computer Science (getting a minor in Info Sci!)
+-   Team member 4: David Yang, Senior in Info Sci and Dyson
+-   Team member 5: Amy Zhang, Information Science, Class of 2024, from Vancouver and Shanghai\

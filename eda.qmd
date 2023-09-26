@@ -1,0 +1,261 @@
+---
+title: "Coffee Ratings"
+subtitle: "Exploratory data analysis"
+format: html
+editor: visual
+execute:
+  echo: true
+---
+
+# Research question(s)
+
+Research question(s). State your research question (s) clearly.
+
+Coffee is one of the most widely consumed beverages around the world, and with the current day world being more interconnected as ever, we have access to a vast variety of coffee beans from different places around the world that each differ slightly contributing to a different flavor. By researching into these geographical differences and analyzing the factors that contribute to the different flavors, consumers would be able to learn more about the different options and how the flavors differ such as in acidity, sweetness, fragrance, and balance to make their optimal choice. As we expect geographical location to be a main factor in affecting the taste of coffee, we expect that coffee beans from the same regions and altitudes would have similar ratings while coffee from differing regions and altitudes would have a greater difference in taste. Our research question explores **how the countries and altitude of the coffee beans affect the rating of different coffees.**
+
+# Data collection and cleaning
+
+Have an initial draft of your data-cleaning appendix. Document every step that takes your raw data file(s) and turns it into the analysis-ready data set that you would submit with your final project. Include text narrative describing your data collection (downloading, scraping, surveys, etc) and any additional data curation/cleaning (merging data frames, filtering, transformations of variables, etc). Include code for data curation/cleaning, but not collection.
+
+```{r}
+#| label: clean-data
+
+library(tidyverse)
+library(skimr)
+library(haven)
+
+coffee_ratings <- read_csv("data/coffee_ratings.csv")
+
+coffee_ratings_clean <- coffee_ratings |>
+  select(c(1, 2, 4, 11, 16: 17, 20:26, 43)) |>
+  drop_na(region,harvest_year, grading_date, altitude_mean_meters) |>
+  separate(col = grading_date, into = c(NA, "grading_year"), sep = "\\,") |>
+  mutate(
+    grading_year = parse_number(grading_year),
+    harvest_year = parse_number(harvest_year)
+  ) |>
+  filter(substr(harvest_year, 1,2) == "20") |>
+  filter(str_length(harvest_year) <= 4)
+
+```
+
+In order to clean the data, we got rid of unnecessary columns that we do not need in our investigation. The columns we kept in the data frames, such as `country_of_origin`, `harvest_year`, and `aroma`, all contribute relevant information to our study. Additionally, we further cleaned our data by dropping NULL values in each cell. Then, we cleaned up the `harvest_year` and `grading_year` by separating date, month, and year, leaving only the year of that specific coffee entry. Data cleaning can effectively help us to work with data more easily when we plot out graphs and explore relationships.
+
+# Data description
+
+Have an initial draft of your data description section. Your data description should be about your analysis-ready data.
+
+With the cleaned data, each observation contain information about a coffee bean (Arabica and Robusta) and its total cup points, species, country of origin, region, harvest year, grading year, aroma, flavor, aftertaste, acidity, body, balance, and altitude mean meters. The attributes and columns are the categories that the observation contains information about including total cup points, species, country of origin, region, harvest year, grading year, aroma, flavor, aftertaste, acidity, body, balance, and altitude mean meters. The original data set was funded by the Coffee Quality Institute and created by Buzzfeed Data Scientist James LeDoux to analyze the reviews of 1312 arabica and 28 robusta coffee beans and produce an article on the top coffee around the world. The process of James LeDoux using an external data set meant that the data was not directly observed and recorded by LeDoux so we do not know how the initial data was cleaned and chosen to be recorded or not. The data was first collected by having the Coffee Quality Institute's trained reviewers do the reviews of the coffee beans. Then, James LeDoux analyzed the reviews and processed it into the current data form. The people involved were the Coffee Quality Institute's trained reviewers and they were aware of the data collection and expected for their reviews/ ratings to be used for consumers to know about the flavor ratings of different coffees.
+
+# Data limitations
+
+Identify any potential problems with your dataset.
+
+A potential limiation of the dataset is that it only contains attributes/columns on flavor very vaguely in that we can only identify the flavor, aftertaste, aroma, acidity, body, and balance but will not be able to determine suppose if the coffee has a more sour flavor or bitter flavor.All the flavors are rated on the numerical scale and flavor is usually a preference thing for users so the numerical scales only a reflection of the reviewers' taste.
+
+# Exploratory data analysis
+
+Perform an (initial) exploratory data analysis.
+
+```{r}
+#| label: skim
+
+skimr::skim(coffee_ratings_clean)
+```
+
+```{r}
+#| label: altitude-cup-points
+#| fig-width: 8
+#| fig-height: 6
+
+coffee_ratings_clean |>
+  ggplot(mapping = aes(x = altitude_mean_meters, y = total_cup_points, color = species)) +
+  geom_point() +
+  labs(
+    x = "Mean Altitude (m)",
+    y = "Total Cup Points",
+    title = "Effect of Altitude on Total Cup Points for Coffee",
+    color = "Coffee Species",
+    caption = "Note: removed 2 high altitude data points and 1 low score point to view pattern of data"
+  ) +
+  scale_x_continuous(limits = c(0, 5000)) +
+  scale_y_continuous(limits = c(50, 100)) +
+  theme_minimal()
+```
+
+We could not notice any particular pattern in the total cup points for each coffee type based on mean altitude (in meters). We decided to take a deeper look at each of the factors that affected the total cup points to see if there were any underlying trends.
+
+```{r}
+#| label: altitude-taste-scores
+#| fig-width: 8
+#| fig-height: 6
+
+coffee_ratings_clean |>
+  ggplot(mapping = aes(x = altitude_mean_meters, y = aroma, color = species)) +
+  geom_point() +
+  labs(
+    x = "Mean Altitude (m)",
+    y = "Aroma Score",
+    title = "Effect of Altitude on Coffee Aroma",
+    color = "Coffee Species",
+    caption = "Note: removed 2 high altitude data points and 1 low score point to view pattern of data"
+  ) +
+  scale_x_continuous(limits = c(0, 5000)) +
+  scale_y_continuous(limits = c(5, 10)) +
+  theme_minimal()
+
+
+coffee_ratings_clean |>
+  ggplot(mapping = aes(x = altitude_mean_meters, y = flavor, color = species)) +
+  geom_point() +
+  labs(
+    x = "Mean Altitude (m)",
+    y = "Flavor Score",
+    title = "Effect of Altitude on Coffee Flavor",
+    color = "Coffee Species",
+    caption = "Note: removed 2 high altitude data points and 1 low score point to view pattern of data"
+  ) +
+  scale_x_continuous(limits = c(0, 5000)) +
+  scale_y_continuous(limits = c(5, 10)) +
+  theme_minimal()
+
+coffee_ratings_clean |>
+  ggplot(mapping = aes(x = altitude_mean_meters, y = aftertaste, color = species)) +
+  geom_point() +
+  labs(
+    x = "Mean Altitude (m)",
+    y = "Aftertaste Score",
+    title = "Effect of Altitude on Coffee Aftertaste",
+    color = "Coffee Species",
+    caption = "Note: removed 2 high altitude data points and 1 low score point to view pattern of data"
+  ) +
+  scale_x_continuous(limits = c(0, 5000)) +
+  scale_y_continuous(limits = c(5, 10)) +
+  theme_minimal()
+
+coffee_ratings_clean |>
+  ggplot(mapping = aes(x = altitude_mean_meters, y = acidity, color = species)) +
+  geom_point() +
+  labs(
+    x = "Mean Altitude (m)",
+    y = "Acidity Score",
+    title = "Effect of Altitude on Coffee Acidity",
+    color = "Coffee Species",
+    caption = "Note: removed 2 high altitude data points and 1 low score point to view pattern of data"
+  ) +
+  scale_x_continuous(limits = c(0, 5000)) +
+  scale_y_continuous(limits = c(5, 10)) +
+  theme_minimal()
+
+coffee_ratings_clean |>
+  ggplot(mapping = aes(x = altitude_mean_meters, y = body, color = species)) +
+  geom_point() +
+  labs(
+    x = "Mean Altitude (m)",
+    y = "Body Score",
+    title = "Effect of Altitude on Coffee Body",
+    color = "Coffee Species",
+    caption = "Note: removed 2 high altitude data points and 1 low score point to view pattern of data"
+  ) +
+  scale_x_continuous(limits = c(0, 5000)) +
+  scale_y_continuous(limits = c(5, 10)) +
+  theme_minimal()
+
+coffee_ratings_clean |>
+  ggplot(mapping = aes(x = altitude_mean_meters, y = balance, color = species)) +
+  geom_point() +
+  labs(
+    x = "Mean Altitude (m)",
+    y = "Balance Score",
+    title = "Effect of Altitude on Coffee Balance",
+    color = "Coffee Species",
+    caption = "Note: removed 2 high altitude data points and 1 low score point to view pattern of data"
+  ) +
+  scale_x_continuous(limits = c(0, 5000)) +
+  scale_y_continuous(limits = c(5, 10)) +
+  theme_minimal()
+```
+
+```{r}
+#| label: facet-countries
+#| fig-width: 10
+#| fig-height: 10
+
+coffee_ratings_filtered <- coffee_ratings_clean |>
+  filter(country_of_origin %in% c("Brazil", "China", "Taiwan", "United States", "Mexico", "Kenya", "Ethiopia", "Costa Rica", "Thailand"))
+
+coffee_ratings_filtered |>
+  ggplot(mapping = aes(x = altitude_mean_meters, y = total_cup_points, color = processing_method)) +
+  geom_point() +
+  labs(
+    x = "Mean Altitude (m)",
+    y = "Total Cup Points",
+    title = "Coffee Cup Points based on Mean Altitude, sorted by Country",
+    subtitle = "For 9 countries of interest",
+    color = "Processing Method"
+  ) +
+  scale_x_continuous(limits = c(0, 4000)) +
+  facet_wrap(~ country_of_origin, ncol = 3) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+```{r}
+#| label: mean-scores-by-country
+
+coffee_ratings_mean_country <- coffee_ratings_filtered |>
+  group_by(country_of_origin) |>
+  summarize(mean_cup_points = mean(total_cup_points)) |>
+  arrange(desc(mean_cup_points))
+
+coffee_ratings_mean_country
+```
+
+When looking at processing method, it was interesting to see how different countries specialized in different methods. Coffee ratings seem to differ more based on the country they are from compared to the altitude of which they are grown, which may imply that processing method has a larger impact on the ratings than altitude. After some research, we found that processing method effects flavor and aroma of coffee. To better understand this difference, we looked at the effect of processing method on these aspects of coffee taste.
+
+```{r}
+#| label: processing-flavor
+#| fig-width: 10
+#| fig-height: 6
+
+coffee_ratings_clean |>
+  ggplot(mapping = aes(x = processing_method, y = flavor, color = processing_method)) +
+  geom_boxplot() +
+  labs(
+    x = "Processing Method", 
+    y = "Flavor", 
+    title = "Coffee Flavor by Processing Method"
+  ) +
+  scale_y_continuous(limits = c(5, 10)) +
+  guides(color = FALSE) +
+  theme_minimal()
+
+```
+
+```{r}
+#| label: processing-aroma
+#| fig-width: 10
+#| fig-height: 6
+
+coffee_ratings_clean |>
+  ggplot(mapping = aes(x = processing_method, y = aroma, color = processing_method)) +
+  geom_boxplot() +
+  labs(
+    x = "Processing Method", 
+    y = "Aroma", 
+    title = "Coffee Aroma by Processing Method"
+  ) +
+  scale_y_continuous(limits = c(5, 10)) +
+  guides(color = FALSE) +
+  theme_minimal()
+```
+
+After the exploratory data analysis, it is difficult to see any particular impact that altitude or processing method has on taste scores for coffee. However, there is an interesting range of altitudes where total cup points and taste scores tend to increase slightly, up until a range of "ideal altitudes". We could further investigate this trend as our project moves forward. There is also a slight difference in aroma and flavor scores for different processing methods, although it is difficult to tell if this arises by chance. For example, the Washed/Wet processing method tends to produce less consistent results in aroma and flavor while the Pulped natural/honey method gives very consistent results. However, this could easily be caused by the frequency of which each processing method is used. This would also be interesting to look into in the future.
+
+# Questions for reviewers
+
+List specific questions for your peer reviewers and project mentor to answer in giving you feedback on this phase.
+
+Is the scope of our research question too wide or too narrow?
+
+Should we switch our research question after not finding an obvious relationship between the mean altitude and coffee taste scores?

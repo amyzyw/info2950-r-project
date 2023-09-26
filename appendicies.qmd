@@ -1,0 +1,48 @@
+---
+title: "Project title"
+subtitle: "Appendix to report"
+format: html
+editor: visual
+execute:
+  echo: true
+---
+
+# Data cleaning
+
+In order to clean the data, we got rid of unnecessary column variables that we did not need in our investigation. The columns we kept in the data frames, such as `total_cup_points`, `country_of_origin`, and `processing_method` all contribute relevant information to our study.
+
+Our research question focuses mainly on the origin of the coffee beans in the country and altitude and the processing methods so we only kept the variables that directly affect the data to explore these two questions.
+
+Additionally, we further cleaned our data by dropping the NULL values in each cell. Then, we cleaned up the `harvest_year` and `grading_year` by separating date, month, and year, leaving only the year of that specific coffee entry. Data cleaning can effectively help us to work with data more easily when we plot out graphs and explore relationships.
+
+```{r}
+#| label: appendix-load-package
+#| cache: false
+#| echo: false
+#| warning: false
+
+library(tidyverse)
+library(skimr)
+library(haven)
+```
+
+```{r}
+#| label: appendix-clean
+
+coffee_ratings <- read_csv("data/coffee_ratings.csv")
+
+options(warn = -1)
+
+coffee_ratings_clean <- coffee_ratings |>
+  select(c(1, 2, 4, 11, 13:14, 16: 17, 20:26, 43)) |>
+  drop_na(region,harvest_year, grading_date, altitude_mean_meters) |>
+  separate(col = grading_date, into = c(NA, "grading_year"), sep = "\\,") |>
+  mutate(
+    grading_year = parse_number(grading_year),
+    harvest_year = parse_number(harvest_year)
+  ) |>
+  filter(substr(harvest_year, 1,2) == "20") |>
+  filter(str_length(harvest_year) <= 4)
+```
+
+# Other appendicies (as necessary)

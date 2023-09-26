@@ -1,0 +1,153 @@
+---
+title: "Coffee Ratings"
+subtitle: "Proposal"
+format: html
+editor: visual
+---
+
+```{r}
+#| label: load-pkgs
+#| message: false
+
+library(tidyverse)
+library(skimr)
+library(haven)
+```
+
+# Data 1
+
+## Introduction and data
+
+-   Identify the source of the data.
+
+https://cps.ipums.org/cps-action/variables/group?
+
+-   State when and how it was originally collected (by the original data curator, not necessarily how you found the data).
+
+IPUMS includes data produced by a broad range of agencies, including the Census Bureau, the Bureau of Labor Statistics, the National Science Foundation, the National Center for Health Statistics, the Centers for Disease Control, and the National Aeronautics and Space Administration.
+
+-   Write a brief description of the observations.
+
+The dataset shows individuals' age, education level, weeks they have worked in the last year and their income in a specific year.
+
+## Research question
+
+-   A well formulated research question. (You may include more than one research question if you want to receive feedback on different ideas for your project. However, one per data set is required.)
+
+Is migration level related to an individual's income level in a randomly selected year?
+
+-   A description of the research topic along with a concise statement of your hypotheses on this topic.
+
+Nowadays, as transportation became more efficient and convenient, moving is not a rare thing. There are tons of reasons for people to leave their hometowns and move to a brand new place. We then wonder if this moving decision is related to their economic level. In other words, we hope to learn how a person's financial situation affects their choice (at all) on the moving location. Moreover, we wish to observe the social trend of moving so we also monitor different years.
+
+-   Identify the types of variables in your research question. Categorical? Quantitative?
+
+    Migration level is categorical, income level is quantitative and year is quantitative.
+
+## Glimpse of data
+
+```{r}
+#| label: load-data-1
+
+# add code here
+micro <-
+  read_dta("data/cps_00008.dta")
+filtered <-
+  filter(micro,wkswork2==6,incwage>0&incwage<9999998) |>
+  slice(c(1:1000))
+skimr::skim(filtered)
+```
+
+# Data 2
+
+## Introduction and data
+
+-   Identify the source of the data.
+
+https://think.cs.vt.edu/corgis/csv/coffee/
+
+https://github.com/rfordatascience/tidytuesday/tree/2e9bd5a67e09b14d01f616b00f7f7e0931515d24/data/2020/2020-07-07
+
+-   State when and how it was originally collected (by the original data curator, not necessarily how you found the data).
+
+The original creator of this data set is Buzzfeed Data Scientist James LeDoux who collected the data from the Coffee Quality Institute's review pages in January 2018.
+
+-   Write a brief description of the observations.
+
+Each observation contains information about the coffee's country of origin, owner (of the farm), farm name, altitude, region, producer, bag weight, processing method, company (name), and much more logistical information of its source. There are lots of measurements of its taste and quality, such as flavor, aftertaste, acidity, body, balance, uniformity, moisture, sweetness, and color.
+
+## Research question
+
+-   A well formulated research question. (You may include more than one research question if you want to receive feedback on different ideas for your project. However, one per data set is required.)
+
+Do certain regions around the world specialize in different tastes of coffee?
+
+Which region produces the highest quality coffee?
+
+What components of the coffee's quality and taste is affected by the altitude of where it is grown?
+
+-   A description of the research topic along with a concise statement of your hypotheses on this topic.
+
+Coffee is one of the most widely consumed beverages around the world, and with the current day world being more interconnected as ever, we have access to different types of coffee from all across the globe. Researching into the geographical differences of coffee sources would inform consumers worldwide about different options that might best suit different tastes. We do expect that coffee that come from the same regions and altitudes might have similar ratings, and the more geographically separate two regions are, the less similar their coffee may taste.
+
+-   Identify the types of variables in your research question. Categorical? Quantitative?
+
+Categorical variables: region, country, farm name, processing method, company, color
+
+Quantitative variables: all taste/quality scores out of 10 (flavor, aftertaste, acidity, etc.), altitude, bag weight
+
+## Glimpse of data
+
+```{r}
+#| label: load-data-2
+
+# add code here
+coffee_ratings <- read_csv("data/coffee_ratings.csv")
+skimr::skim(coffee_ratings)
+```
+
+# Data 3
+
+## Introduction and data
+
+-   Identify the source of the data.
+
+https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/QFTAPM
+
+-   State when and how it was originally collected (by the original data curator, not necessarily how you found the data).
+
+The original data curator collected the data and published it on March 8, 2023. It was collected through using the General Transit Feed Specification (GTFS) data that over 80 transit agencies in Canada published their transit data with.
+
+-   Write a brief description of the observations.
+
+Each observation contains data about the bus's segment id, route id, direction, number of traversals, distance, id of each stop, geometry of path, start point, and end point. The observations provide information about each bus in Toronto - Greater Ontario and their corresponding route and the placement of the stops. The multiple data about the stops such as stop 1 id, stop 2 id, start point, and end point in each response seem repetitive in the sense that they are all locations but are critical to determining the placement of all the stops for the corresponding bus observation and its route.
+
+## Research question
+
+-   A well formulated research question. (You may include more than one research question if you want to receive feedback on different ideas for your project. However, one per data set is required.)
+
+Does the geometry of the bus route affect the distance and amount of stops along the bus route?
+
+What correlations can be observed between the bus path stops and the number of traversals?
+
+Do buses in opposite directions follow the same path and stops or how do they differ?
+
+-   A description of the research topic along with a concise statement of your hypotheses on this topic.
+
+As a major city with one of the largest span of land, Toronto and the Greater Ontario area requires a complete and efficient transit system in order to function. As one of the most relied upon methods of travel, buses in Toronto must have routes that cover most points on the map to allow for ease of travel in the city. Studying the bus routes of all the buses in Toronto will allow for us to observe whether the current locations of bus stops, distance between stops, and geometry of the bus routes are effectively covering the map in an efficient manner. We can expect that loop bus routes have more and closer stops than a straight line path as straight line paths would take too long from start to end point otherwise. We can also expect that bus paths with shorter or lesser stops would have more traversals due to needing to serve citizens on a shorter path duration most likely with higher population and frequency required. Most likely, bus paths in opposite direction can be hypothesized to be the same as the same required stops would make more sense in covering the map as different route buses can be used for different paths. These questions are important in helping to plan future or change existing bus paths such as identifying unnecessary repeated paths or seeing points that lack transit.
+
+-   Identify the types of variables in your research question. Categorical? Quantitative?
+
+    categorical variables: segment_id, route_id, direction_id, stop_id1, stop_id2, geometry, start_point, end_point
+
+    quantitative variables: traversals, distance
+
+## Glimpse of data
+
+```{r}
+#| label: load-data-3
+
+# add code here
+bus_spacing <- read_csv("data/spacings_with_geometry.csv")
+skimr::skim(bus_spacing)
+```

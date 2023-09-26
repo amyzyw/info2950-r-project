@@ -1,0 +1,50 @@
+---
+title: "Coffee Ratings"
+subtitle: "Preregistration of analyses"
+format: html
+editor: visual
+execute:
+  echo: true
+---
+
+research question: Our research question explores **how the countries and altitude of the coffee beans affect the rating of different coffees.**
+
+# Analysis #1
+
+Describe your first analysis here.
+
+We aim to test whether variables altitude and country have an impact on the rating scores of coffee. We will be using coffee rating as the dependent variable and country and altitude as independent variables.
+
+We aim to test whether variables altitude and country have an impact on the rating scores of coffee. We will be using coffee rating as the dependent variable and country and altitude as independent variables.
+
+$$
+H_0: There~is~not~a~significant~relationship~between~altitude~,country,~and~coffee~rating.
+$$
+
+$$
+H_a: There~is~a~significant~relationship~between~altitude~,country,~and~coffee~rating
+$$
+
+We will run a multiple linear regression and compute for the p-value. If the p-value is smaller than our chosen significance level, there is significant evidence for us to reject the null hypothesis.
+
+Using our general knowledge about coffee beans, we think that the relationship between altitude and the rating scores of coffee might be a negative one. Since most good coffee beans are produced in tropical countries, especially in South America and Africa, we deduce that coffee beans grow better in hot climates. Higher altitude would mean a colder and drier environment which may not be suitable for the beans to grow.
+
+# Analysis #2
+
+Describe your second analysis here.
+
+We are testing for whether the processing and storage method of the coffee beans will have an impact on the rating scores of the coffee. We will use coffee rating as the dependent variable and processing method as the independent variable.
+
+Given our limited knowledge about coffee bean processing methods, we believe that the different methods product different qualities of coffee. These methods include Natural/Dry, Pulped natural / honey, Semi-washed / Semi-pulped, and Washed / Wet. We plan to visualize the difference between the scores for all different processing types using a box-plot and analyze the distributions. We also plan to conduct a hypothesis test is that Natural / Dry versus Washed / Wet will produce the most different results.
+
+Hypothesis test:
+
+$$
+H_0: \mu_{Dry} - \mu_{Wet} = 0
+$$
+
+$$
+H_A: \mu_{Dry} - \mu_{Wet} \neq 0
+$$
+
+If the p-value we compute is smaller than our chosen significance level of 0.05, there is significant evidence for us to reject the null hypothesis that the Natural / Dry processing method results in the same coffee score as using the Washed / Wet processing method.

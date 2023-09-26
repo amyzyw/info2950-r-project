@@ -1,0 +1,8 @@
+---
+title: "Skillful Hitmontop"
+subtitle: "INFO 2950 Project"
+format: html
+editor: visual
+---
+
+The primary objective of our project is to conduct a comprehensive analysis of the key factors that impact coffee ratings. Our findings will offer valuable insights on how to select the finest coffee. Our team's research looks at various aspects of coffee production, including the cultivation and processing of coffee beans, to assess their influence on coffee quality. In terms of coffee bean growth, we explored the relationship between altitude, origin countries, and coffee ratings. Similarly, we also examined the impact of different processing methods on coffee quality. Based on our in-depth analysis, we have determined that origin countries and processing methods are helpful factors to consider when choosing coffee.

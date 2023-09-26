@@ -1,0 +1,183 @@
+---
+title: "Brewed to Perfection" 
+subtitle: "A Case Study on Coffee Rating and Other Factors"
+author: "Skillful Hitmontop <br> Yvie Cai, Amy Zhang, Cathryn Li, David Yang, Serena Zhao"
+date: "2023.5.4"
+format: revealjs
+editor: visual
+execute:
+  echo: false
+---
+
+```{r}
+#| label: load-packages
+#| include: false
+#| cache: false
+
+library(tidyverse)
+library(tidymodels)
+library(skimr)
+library(haven)
+```
+
+```{r}
+#| label: clean-data
+#| include: false
+
+coffee_ratings <- read_csv("data/coffee_ratings.csv")
+
+coffee_ratings_clean <- coffee_ratings |>
+  select(c(1, 2, 4, 11, 13:14, 16: 17, 20:26, 43)) |>
+  drop_na(region,harvest_year, grading_date, altitude_mean_meters) |>
+  separate(col = grading_date, into = c(NA, "grading_year"), sep = "\\,") |>
+  mutate(
+    grading_year = parse_number(grading_year),
+    harvest_year = parse_number(harvest_year)
+  ) |>
+  filter(substr(harvest_year, 1,2) == "20") |>
+  filter(str_length(harvest_year) <= 4)
+```
+
+## Introduce the data {.smaller}
+
+We are using the data set retrieved from https://think.cs.vt.edu/corgis/csv/coffee/. The original creator of this data set is Buzzfeed Data Scientist James LeDoux who collected the data from the Coffee Quality Institute's review pages in January 2018.
+
+**Research Question: What factors affect the rating of coffee?**
+
+![](https://nationalcoffeeblog.files.wordpress.com/2016/09/coffee-wink.gif)
+
+## Exploratory Analysis & Data Cleaning {.smaller}
+
+::: panel-tabset
+### Part A
+
+```{r}
+#| label: rating-vs-altitude-plot
+coffee_ratings_clean |>
+  ggplot(mapping = aes(x = altitude_mean_meters, y = total_cup_points, color = species)) +
+  geom_point() +
+  labs(
+    x = "Mean Altitude (m)",
+    y = "Total Cup Points",
+    title = "Effect of Altitude on Total Cup Points for Coffee",
+    color = "Coffee Species",
+    caption = "Note: removed 2 high altitude data points and 1 low score point to view pattern of data"
+  ) +
+  scale_x_continuous(limits = c(0, 5000)) +
+  scale_y_continuous(limits = c(50, 100)) +
+  theme_minimal()
+```
+
+### Part B
+
+```{r}
+#| label: cup-points-sorted-country
+
+
+coffee_ratings_filtered <- coffee_ratings_clean |>
+  filter(country_of_origin %in% c("Brazil", "China", "Taiwan", "United States", "Mexico", "Kenya", "Ethiopia", "Costa Rica", "Thailand"))
+
+coffee_ratings_filtered |>
+  ggplot(mapping = aes(x = altitude_mean_meters, y = total_cup_points, color = processing_method)) +
+  geom_point() +
+  labs(
+    x = "Mean Altitude (m)",
+    y = "Total Cup Points",
+    title = "Coffee Cup Points based on Mean Altitude, sorted by Country",
+    subtitle = "For 9 countries of interest",
+    color = "Processing Method"
+  ) +
+  scale_x_continuous(limits = c(0, 4000)) +
+  facet_wrap(~ country_of_origin, ncol = 3) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+### Part C
+
+```{r}
+coffee_ratings_clean |>
+  ggplot(mapping = aes(x = processing_method, y = flavor, color = processing_method)) +
+  geom_boxplot() +
+  labs(
+    x = "Processing Method", 
+    y = "Flavor", 
+    title = "Coffee Flavor by Processing Method"
+  ) +
+  scale_y_continuous(limits = c(5, 10)) +
+  scale_x_discrete(labels = element_blank())+
+  theme_minimal()
+```
+
+### Part D
+
+```{r}
+
+coffee_weight <- coffee_ratings_clean |>
+  mutate(bag_weight_numeric = as.numeric(str_extract(bag_weight, "\\d+"))) |>
+  group_by(country_of_origin) |>
+  summarise(total_weight = sum(bag_weight_numeric * number_of_bags))
+
+top_producers <- coffee_weight |>
+  arrange(desc(total_weight)) |>
+  head(10)
+
+top_producers |>
+  ggplot(mapping = aes(x = reorder(country_of_origin, total_weight, decreasing = TRUE), 
+                       y = total_weight)) +
+  geom_bar(stat = "identity") +
+  labs(
+    x = "Country of Origin",
+    y = "Total Weight of Coffee Produced (tons)",
+    title = "Top 10 Countries Producing the Most Coffee",
+    caption = "Ranking is according to our dataset acquired from 
+    https://github.com/jldbc/coffee-quality-database \nand may not 
+    accurately represent modern-day coffee stats."
+  ) +
+  theme_minimal() +
+  scale_y_continuous(labels = function(x) x / 1000)
+
+country_tibble <- c("Costa Rica", "Kenya", "Honduras", "Uganda", "Guatemala", 
+                    "Colombia", "Brazil", "Ethiopia", "Nicaragua", "El Salvador")
+```
+:::
+
+## Analysis #1: {.smaller}
+
+We aim to test whether variables altitude and country have an impact on the rating scores of coffee. We will be using coffee rating as the dependent variable and country and altitude as independent variables.
+
+$$
+H_0: There~is~not~a~significant~relationship~between~\\altitude~,country,~and~coffee~rating.
+$$
+
+$$
+H_a: There~is~a~significant~relationship~between~\\altitude~,country,~and~coffee~rating
+$$
+
+We got a p-value that is lower than the significance level based on our additive and interactive model. There is a significant interaction between altitude, country, and coffee rating. Upon further analysis, we examined altitude alone and got a p-value that is higher than the significance level, which means it does not have a relationship with the coffee rating.
+
+## Analysis #2: {.smaller}
+
+We are testing for whether the processing and storage method of the coffee beans will have an impact on the rating scores of the coffee. We will use coffee rating as the dependent variable and processing method as the independent variable.
+
+$$
+H_0: There~is~not~a~significant~relationship~between~processing~method~and~coffee~rating.
+$$
+
+$$
+H_a: There~is~a~significant~relationship~between~processing~method~and~coffee~rating
+$$
+
+The p values for processing methods are lower than 0.02, so we can reject the null hypothesis. Interestingly, only the Washed / Wet processing method and Other methods have a significant impact on the coffee rating. The remaining methods are mostly attributed to randomness.
+
+## Conclusions + future work {.smaller}
+
+Based on our analysis, we came to the conclusion that while altitude has no effect on ratings, a few countries and certain processing methods have an impact on ratings. There is no interaction between the countries and the altitude.
+
+\-\-\--
+
+**Limitations of our analysis:**
+
+-   We are not able to determine if the coffee has a more sour flavor or bitter flavor.
+
+-   All the flavors are rated on the numerical scale and flavor is usually a preference thing for users so the numerical scales only a reflection of the reviewers' taste.
